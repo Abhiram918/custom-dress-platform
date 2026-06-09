@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+
+{% block title %}Join DressPlatform | Express Your Style{% endblock %}
+
+{% block content %}
+<div class="auth-container animate-up" style="max-width: 600px;">
+    <div style="text-align: center; margin-bottom: 30px;">
+        <h2 style="font-size: 2rem; color: var(--secondary);">Join the Elite</h2>
+        <p style="color: var(--text-muted);">Choose your role and start creating.</p>
+    </div>
+
+    <form method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+            {% for field in form %}
+            {% if field.name == 'address' or field.name == 'profile_picture' %}
+            <div class="form-group" style="grid-column: span 2;">
+                {% else %}
+                <div class="form-group">
+                    {% endif %}
+                    <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                    {{ field }}
+                    {% if field.help_text %}
+                    <small style="color: #999; display: block; margin-top: 5px;">{{ field.help_text }}</small>
+                    {% endif %}
+                    {% if field.errors %}
+                    <div style="color: #e74c3c; font-size: 0.8rem; margin-top: 5px;">
+                        {{ field.errors }}
+                    </div>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            </div>
+
+            <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 20px;">Create Account</button>
+    </form>
+
+    <div style="margin-top: 30px; text-align: center; font-size: 0.9rem;">
+        <p>Already a member? <a href="{% url 'login' %}"
+                style="color: var(--primary); font-weight: 600; text-decoration: none;">Sign in here</a></p>
+    </div>
+</div>
+{% endblock %}

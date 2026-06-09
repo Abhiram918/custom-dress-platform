@@ -1,0 +1,139 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Update Profile - Custom Dress Platform{% endblock %}
+
+{% block extra_css %}
+<style>
+    .update-container {
+        max-width: 700px;
+        margin: 60px auto;
+        padding: 0 20px;
+    }
+
+    .update-card {
+        background: var(--white);
+        padding: 40px;
+        border-radius: 30px;
+        box-shadow: var(--shadow);
+        animation: fadeInUp 0.8s ease;
+    }
+
+    .update-header {
+        margin-bottom: 35px;
+        text-align: center;
+    }
+
+    .update-header h1 {
+        font-size: 2rem;
+        color: var(--secondary);
+        margin-bottom: 10px;
+    }
+
+    .update-header p {
+        color: var(--text-muted);
+    }
+
+    .form-group {
+        margin-bottom: 25px;
+    }
+
+    .form-group label {
+        display: block;
+        margin-bottom: 10px;
+        font-weight: 600;
+        color: var(--secondary);
+        font-size: 0.95rem;
+    }
+
+    .form-control {
+        width: 100%;
+        padding: 14px 20px;
+        border-radius: 12px;
+        border: 1.5px solid #eee;
+        outline: none;
+        transition: var(--transition);
+        background: #fcfcfc;
+    }
+
+    .form-control:focus {
+        border-color: var(--primary);
+        background: #fff;
+        box-shadow: 0 0 0 4px rgba(197, 168, 128, 0.1);
+    }
+
+    .update-actions {
+        display: flex;
+        gap: 20px;
+        margin-top: 40px;
+    }
+
+    .btn-save {
+        flex: 2;
+    }
+
+    .btn-cancel {
+        flex: 1;
+        text-align: center;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .help-text {
+        font-size: 0.8rem;
+        color: var(--text-muted);
+        margin-top: 5px;
+    }
+
+    .error-list {
+        color: #e74c3c;
+        font-size: 0.85rem;
+        margin-top: 5px;
+        list-style: none;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="update-container">
+    <div class="update-card">
+        <div class="update-header">
+            <i class="fas fa-user-edit"
+                style="font-size: 3rem; color: var(--primary); margin-bottom: 20px; display: block;"></i>
+            <h1>Update Profile</h1>
+            <p>Keep your information up to date</p>
+        </div>
+
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+
+            {% for field in form %}
+            <div class="form-group">
+                <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                {{ field }}
+                {% if field.help_text %}
+                <div class="help-text">{{ field.help_text|safe }}</div>
+                {% endif %}
+                {% if field.errors %}
+                <ul class="error-list">
+                    {% for error in field.errors %}
+                    <li>{{ error }}</li>
+                    {% endfor %}
+                </ul>
+                {% endif %}
+            </div>
+            {% endfor %}
+
+            <div class="update-actions">
+                <button type="submit" class="btn btn-primary btn-save">
+                    <i class="fas fa-check"></i> Save Changes
+                </button>
+                <a href="{% url 'profile' %}" class="btn btn-outline btn-cancel">
+                    Cancel
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

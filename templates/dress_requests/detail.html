@@ -1,0 +1,254 @@
+{% extends 'base.html' %}
+
+{% block title %}Request #{{ dress_request.id }} | DressPlatform{% endblock %}
+
+{% block content %}
+<section class="section">
+    <style>
+        .status-badge {
+            padding: 10px 20px;
+            border-radius: 50px;
+            font-weight: 700;
+            text-transform: uppercase;
+            font-size: 0.85rem;
+        }
+
+        .status-pending {
+            background: #fff8e1;
+            color: #f57f17;
+        }
+
+        .status-accepted {
+            background: #e8f5e9;
+            color: #2e7d32;
+        }
+
+        .status-declined {
+            background: #ffebee;
+            color: #c62828;
+        }
+
+        .status-default {
+            background: #f5f5f5;
+            color: #757575;
+        }
+
+        .color-swatch-dynamic {
+            width: 16px;
+            height: 16px;
+            background-color: var(--bg-color);
+            border-radius: 50%;
+            border: 1px solid #ddd;
+        }
+    </style>
+    <div style="max-width: 900px; margin: 0 auto;">
+        <div class="animate-up"
+            style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 40px;">
+            <div>
+                <h2 style="font-size: 2.5rem;">Request Detail</h2>
+                <p style="color: var(--text-muted);">Submitted on {{ dress_request.created_at|date:"F j, Y" }}</p>
+            </div>
+            <span
+                class="status-badge {% if dress_request.status == 'pending' %}status-pending{% elif dress_request.status == 'accepted' %}status-accepted{% elif dress_request.status == 'declined' %}status-declined{% else %}status-default{% endif %}">
+                {{ dress_request.get_status_display }}
+            </span>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1.5fr 1fr; gap: 40px;">
+            <div class="animate-up">
+                <div
+                    style="background: white; padding: 35px; border-radius: 25px; box-shadow: var(--shadow); margin-bottom: 30px;">
+                    <h3 style="margin-bottom: 20px; border-bottom: 1px solid #f0f0f0; padding-bottom: 15px;">Proposal
+                        Information</h3>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                        <div>
+                            <p style="font-size: 0.85rem; color: var(--text-muted);">Dress Type</p>
+                            <p style="font-weight: 600;">{{ dress_request.get_dress_type_display }}</p>
+                        </div>
+                        <div>
+                            <p style="font-size: 0.85rem; color: var(--text-muted);">Budget</p>
+                            <p style="font-weight: 600;">${{ dress_request.budget }}</p>
+                        </div>
+                        <div>
+                            <p style="font-size: 0.85rem; color: var(--text-muted);">Deadline</p>
+                            <p style="font-weight: 600;">{{ dress_request.deadline|default:"Not specified" }}</p>
+                        </div>
+                    </div>
+
+                    <div style="margin-top: 25px;">
+                        <p style="font-size: 0.85rem; color: var(--text-muted);">Description</p>
+                        <p style="white-space: pre-wrap; margin-top: 5px;">{{ dress_request.description }}</p>
+                    </div>
+
+                    <div style="margin-top: 30px;">
+                        <h4 style="font-size: 1rem; margin-bottom: 15px;">Detailed Specifications</h4>
+                        <div
+                            style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; background: #fcfcfc; padding: 15px; border-radius: 15px; border-bottom-left-radius: 0; border-bottom-right-radius: 0;">
+                            <div style="text-align: center;">
+                                <p style="font-size: 0.75rem; color: var(--text-muted);">Bust</p>
+                                <p style="font-weight: 700;">{{ dress_request.bust|default:"-" }}"</p>
+                            </div>
+                            <div style="text-align: center;">
+                                <p style="font-size: 0.75rem; color: var(--text-muted);">Waist</p>
+                                <p style="font-weight: 700;">{{ dress_request.waist|default:"-" }}"</p>
+                            </div>
+                            <div style="text-align: center;">
+                                <p style="font-size: 0.75rem; color: var(--text-muted);">Hips</p>
+                                <p style="font-weight: 700;">{{ dress_request.hips|default:"-" }}"</p>
+                            </div>
+                            <div style="text-align: center;">
+                                <p style="font-size: 0.75rem; color: var(--text-muted);">Height</p>
+                                <p style="font-weight: 700;">{{ dress_request.height|default:"-" }}"</p>
+                            </div>
+                        </div>
+                        <div
+                            style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; background: #f8f8ff; padding: 15px; border-radius: 15px; border-top-left-radius: 0; border-top-right-radius: 0; border-top: 1px dashed #eee; border-bottom: 1px dashed #eee;">
+                            <div style="text-align: center; border-right: 1px solid #eee;">
+                                <p style="font-size: 0.75rem; color: var(--text-muted);">Sleeve</p>
+                                <p style="font-weight: 700;">{{ dress_request.sleeve_length|default:"-" }}"</p>
+                            </div>
+                            <div style="text-align: center; border-right: 1px solid #eee;">
+                                <p style="font-size: 0.75rem; color: var(--text-muted);">Fabric</p>
+                                <p style="font-weight: 700; text-transform: capitalize;">{{ dress_request.fabric_type }}
+                                </p>
+                            </div>
+                            <div style="text-align: center;">
+                                <p style="font-size: 0.75rem; color: var(--text-muted);">Preferred Color</p>
+                                <div style="display: flex; align-items: center; justify-content: center; gap: 8px;">
+                                    <div class="color-swatch-dynamic"
+                                        style="--bg-color: {{ dress_request.preferred_color }};"></div>
+                                    <span style="font-weight: 700; font-size: 0.85rem;">{{ dress_request.preferred_color|upper }}</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div
+                            style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; background: #fcfcfc; padding: 15px; border-radius: 15px; border-top-left-radius: 0; border-top-right-radius: 0; border-top: none;">
+                            <div style="text-align: center; border-right: 1px solid #eee;">
+                                <p style="font-size: 0.75rem; color: var(--text-muted);">Neck Type</p>
+                                <p style="font-weight: 700;">{{ dress_request.get_neck_type_display|default:"-" }}</p>
+                            </div>
+                            <div style="text-align: center;">
+                                <p style="font-size: 0.75rem; color: var(--text-muted);">Hemline</p>
+                                <p style="font-weight: 700;">{{ dress_request.get_hemline_display|default:"-" }}</p>
+                            </div>
+                        </div>
+
+                        {% if dress_request.reference_photo %}
+                        <div style="margin-top: 25px;">
+                            <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 10px;">Reference
+                                Photo</p>
+                            <a href="{{ dress_request.reference_photo.url }}" target="_blank">
+                                <img src="{{ dress_request.reference_photo.url }}" alt="Reference Photo"
+                                    style="max-width: 100%; border-radius: 15px; box-shadow: var(--shadow-sm); border: 1px solid #eee;">
+                            </a>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <div class="animate-up" style="animation-delay: 0.1s;">
+                <div
+                    style="background: white; padding: 30px; border-radius: 25px; box-shadow: var(--shadow); margin-bottom: 30px; text-align: center;">
+                    {% if user.user_type == 'designer' %}
+                    <p style="color: var(--text-muted); font-size: 0.9rem;">Customer Information</p>
+                    <h3 style="margin: 10px 0;">{{ customer_name }}</h3>
+                    <p>{{ dress_request.customer.email }}</p>
+                    {% else %}
+                    <p style="color: var(--text-muted); font-size: 0.9rem;">Designer Information</p>
+                    <h3 style="margin: 10px 0;">{{ dress_request.designer.business_name }}</h3>
+                    <span style="color: var(--primary); font-weight: 600;">{{ designer_specialty }}</span>
+                    {% endif %}
+                </div>
+
+                <div
+                    style="background: var(--bg-dark); color: white; padding: 30px; border-radius: 25px; box-shadow: var(--shadow);">
+                    {% if dress_request.status == 'pending' %}
+                    {% if user == dress_request.designer.user %}
+                    <h3 style="margin-bottom: 20px;">Respond to Request</h3>
+                    <form action="{% url 'respond_to_request' dress_request.pk %}" method="POST">
+                        {% csrf_token %}
+                        <div class="form-group">
+                            <label style="color: #aaa;">Your Decision</label>
+                            <select name="status" class="form-control"
+                                style="background: #333; color: white; border: none; margin-bottom: 15px;">
+                                <option value="accepted">Accept Request</option>
+                                <option value="declined">Decline Request</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label style="color: #aaa;">Quoted Price ($)</label>
+                            <input type="number" name="quoted_price" class="form-control"
+                                style="background: #333; color: white; border: none; margin-bottom: 15px;"
+                                placeholder="Final price">
+                        </div>
+                        <div class="form-group">
+                            <label style="color: #aaa;">Estimated Completion</label>
+                            <input type="date" name="estimated_completion" class="form-control"
+                                style="background: #333; color: white; border: none; margin-bottom: 15px;">
+                        </div>
+                        <div class="form-group">
+                            <label style="color: #aaa;">Notes for Customer</label>
+                            <textarea name="designer_notes" class="form-control"
+                                style="background: #333; color: white; border: none; margin-bottom: 20px;"
+                                rows="3"></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary" style="width: 100%;">Submit Response</button>
+                    </form>
+                    {% else %}
+                    <div style="text-align: center; padding: 20px;">
+                        <i class="fas fa-clock"
+                            style="font-size: 2rem; color: var(--primary); margin-bottom: 15px;"></i>
+                        <p>Waiting for designer to respond...</p>
+                    </div>
+                    {% endif %}
+                    {% elif dress_request.status == 'accepted' %}
+                    <h3 style="margin-bottom: 20px;">Designer Response</h3>
+                    <div style="margin-bottom: 20px;">
+                        <p style="color: #aaa; font-size: 0.85rem;">Quoted Price</p>
+                        <h2 style="color: var(--primary); font-size: 2.2rem;">${{ dress_request.quoted_price }}</h2>
+                    </div>
+                    <div style="margin-bottom: 20px;">
+                        <p style="color: #aaa; font-size: 0.85rem;">Est. Completion</p>
+                        <p style="font-weight: 600;">{{ dress_request.estimated_completion|date:"F j, Y" }}</p>
+                    </div>
+                    <div style="margin-bottom: 30px;">
+                        <p style="color: #aaa; font-size: 0.85rem;">Designer's Notes</p>
+                        <p style="font-style: italic; font-size: 0.95rem;">"{{ dress_request.designer_notes }}"</p>
+                    </div>
+
+                    {% if user == dress_request.customer %}
+                    {% if not dress_request.order %}
+                    <form action="{% url 'create_checkout_session' dress_request.pk %}" method="POST">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-primary"
+                            style="width: 100%; padding: 1.2rem; font-size: 1rem; font-weight: 700;">
+                            <i class="fas fa-credit-card" style="margin-right: 10px;"></i> Proceed to Payment
+                        </button>
+                    </form>
+                    {% else %}
+                    <a href="{% url 'order_detail' dress_request.order.pk %}" class="btn btn-primary"
+                        style="width: 100%;">View Order</a>
+                    {% endif %}
+                    {% endif %}
+                    {% elif dress_request.status == 'declined' %}
+                    <div style="text-align: center; padding: 20px;">
+                        <i class="fas fa-times-circle"
+                            style="font-size: 2rem; color: #e74c3c; margin-bottom: 15px;"></i>
+                        <p>Request Declined</p>
+                    </div>
+                    {% endif %}
+                </div>
+
+                <div style="margin-top: 20px; text-align: center;">
+                    <a href="{% url 'conversation_request' dress_request.pk %}" class="btn btn-outline"
+                        style="width: 100%;">
+                        <i class="fas fa-comments" style="margin-right: 8px;"></i>
+                        Message {% if user == dress_request.customer %}Designer{% else %}Customer{% endif %}
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

@@ -1,0 +1,441 @@
+{% extends 'base.html' %}
+{% block title %}Order Details | DressPlatform{% endblock %}
+{% block content %}
+<section class="section">
+    <div style="max-width: 900px; margin: 0 auto;">
+        <div class="animate-up"
+            style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 40px;">
+            <div>
+                <a href="{% url 'my_orders' %}"
+                    style="text-decoration: none; color: var(--primary); font-size: 0.9rem; font-weight: 600;"><i
+                        class="fas fa-arrow-left"></i> Back to Orders</a>
+                <h2 style="font-size: 2.5rem; margin-top: 10px;">Order Tracker</h2>
+                <p style="color: var(--text-muted);">
+                    {{ order.order_number }} • Created {{ order.created_at|date:"M d, Y" }}
+                </p>
+            </div>
+            <div style="text-align: right;">
+                <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 5px;">Current Status</p>
+                <span
+                    style="padding: 10px 25px; border-radius: 50px; font-weight: 700; text-transform: uppercase; font-size: 0.9rem; background: var(--secondary); color: white;">
+                    {{ order.get_status_display }}
+                </span>
+            </div>
+        </div>
+
+        <!-- Progress Bar -->
+        <div class="animate-up"
+            style="margin-bottom: 60px; background: white; padding: 40px; border-radius: 30px; box-shadow: var(--shadow);">
+            <style>
+                .progress-bar-fill {
+                    position: absolute;
+                    top: 15px;
+                    left: 0;
+                    height: 4px;
+                    background: var(--primary);
+                    z-index: 2;
+                    transition: width 1s ease;
+                }
+
+                .w-0 {
+                    width: 0%;
+                }
+
+                .w-33 {
+                    width: 33%;
+                }
+
+                .w-66 {
+                    width: 66%;
+                }
+
+                .w-100 {
+                    width: 100%;
+                }
+
+                .step-dot {
+                    width: 35px;
+                    height: 35px;
+                    border-radius: 50%;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    margin: 0 auto 10px;
+                }
+
+                .step-active {
+                    background: var(--primary);
+                    color: white;
+                }
+
+                .step-inactive {
+                    background: #eee;
+                    color: #999;
+                }
+            </style>
+            <div style="display: flex; justify-content: space-between; position: relative;">
+                <div
+                    style="position: absolute; top: 15px; left: 0; right: 0; height: 4px; background: #eee; z-index: 1;">
+                </div>
+                <!-- Progress Line -->
+                <div
+                    class="progress-bar-fill {% if order.is_cod %}{% if order.status == 'pending' %}w-0{% elif order.status == 'accepted' %}w-0{% elif order.status == 'in_progress' or order.status == 'altering' %}w-33{% elif order.status == 'ready' or order.status == 'shipped' %}w-66{% elif order.status == 'delivered' or order.status == 'completed' %}w-100{% endif %}{% else %}{% if order.status == 'paid' or order.status == 'accepted' or order.status == 'pending' %}w-0{% elif order.status == 'in_progress' or order.status == 'altering' %}w-33{% elif order.status == 'ready' or order.status == 'shipped' %}w-66{% elif order.status == 'delivered' or order.status == 'completed' %}w-100{% endif %}{% endif %}">
+                </div>
+
+                <div
+                    style="position: relative; z-index: 3; text-align: center; --step-bg: {% if order.is_cod %}{% if order.status != 'pending' %}var(--primary){% else %}#eee{% endif %}{% else %}{% if order.status != 'pending' and order.status != 'accepted' %}var(--primary){% else %}#eee{% endif %}{% endif %}; --step-color: {% if order.is_cod %}{% if order.status != 'pending' %}white{% else %}#999{% endif %}{% else %}{% if order.status != 'pending' and order.status != 'accepted' %}white{% else %}#999{% endif %}{% endif %};">
+                    <div
+                        style="width: 35px; height: 35px; background: var(--step-bg); color: var(--step-color); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 10px;">
+                        {% if order.is_cod %}
+                        {% if order.status != 'pending' %}
+                        <i class="fas fa-check"></i>
+                        {% else %}
+                        1
+                        {% endif %}
+                        {% else %}
+                        {% if order.status != 'pending' and order.status != 'accepted' %}
+                        <i class="fas fa-check"></i>
+                        {% else %}
+                        1
+                        {% endif %}
+                        {% endif %}
+                    </div>
+                    <span style="font-size: 0.8rem; font-weight: 600;">Ordered</span>
+                </div>
+                <div style="position: relative; z-index: 3; text-align: center;">
+                    <div
+                        class="step-dot {% if order.is_cod %}{% if order.status != 'pending' and order.status != 'accepted' %}step-active{% else %}step-inactive{% endif %}{% else %}{% if order.status != 'paid' and order.status != 'accepted' and order.status != 'pending' %}step-active{% else %}step-inactive{% endif %}{% endif %}">
+                        {% if order.status == 'in_progress' or order.status == 'altering' %}
+                        <i class="fas fa-spinner fa-spin"></i>
+                        {% elif order.status == 'ready' or order.status == 'shipped' or order.status == 'delivered' or order.status == 'completed' %}
+                        <i class="fas fa-check"></i>
+                        {% else %}
+                        2
+                        {% endif %}
+                    </div>
+                    <span style="font-size: 0.8rem; font-weight: 600;">Tailoring</span>
+                </div>
+                <div style="position: relative; z-index: 3; text-align: center;">
+                    <div
+                        class="step-dot {% if order.status == 'shipped' or order.status == 'delivered' or order.status == 'completed' %}step-active{% else %}step-inactive{% endif %}">
+                        {% if order.status == 'shipped' %}
+                        <i class="fas fa-truck fa-bounce"
+                            style="--fa-bounce-start-scale-x: 1; --fa-bounce-start-scale-y: 1; --fa-bounce-jump-scale-x: 1; --fa-bounce-jump-scale-y: 1; --fa-bounce-land-scale-x: 1; --fa-bounce-land-scale-y: 1; --fa-bounce-rebound: 0;"></i>
+                        {% elif order.status == 'delivered' or order.status == 'completed' %}
+                        <i class="fas fa-check"></i>
+                        {% else %}
+                        3
+                        {% endif %}
+                    </div>
+                    <span style="font-size: 0.8rem; font-weight: 600;">Shipping</span>
+                </div>
+                <div style="position: relative; z-index: 3; text-align: center;">
+                    <div
+                        class="step-dot {% if order.status == 'delivered' or order.status == 'completed' %}step-active{% else %}step-inactive{% endif %}">
+                        {% if order.status == 'delivered' or order.status == 'completed' %}
+                        <i class="fas fa-check"></i>
+                        {% else %}
+                        4
+                        {% endif %}
+                    </div>
+                    <span style="font-size: 0.8rem; font-weight: 600;">Done</span>
+                </div>
+            </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1.5fr 1fr; gap: 40px;">
+            <div class="animate-up">
+                <div
+                    style="background: white; padding: 35px; border-radius: 25px; box-shadow: var(--shadow); margin-bottom: 30px;">
+                    <h3>Progress Notes</h3>
+                    <div
+                        style="margin-top: 20px; padding: 20px; background: #fcfcfc; border-radius: 15px; border-left: 4px solid var(--primary);">
+                        {% if order.progress_notes %}
+                        <p style="font-style: italic;">"{{ order.progress_notes }}"</p>
+                        {% else %}
+                        <p style="color: var(--text-muted);">No notes yet from the designer.</p>
+                        {% endif %}
+                    </div>
+                    {% if user == order.designer.user or user.is_superuser or user.user_type == 'admin' %}
+                    <form action="{% url 'update_order_status' order.pk %}" method="POST" style="margin-top: 30px;">
+                        {% csrf_token %}
+                        <h4 style="margin-bottom: 20px;">Update Order Progress</h4>
+                        <div class="form-group" style="margin-bottom: 15px;">
+                            <label>Move to Next Phase</label>
+                            <select name="status" class="form-control">
+                                {% if user.is_superuser or user.user_type == 'admin' %}
+                                <option value="{{ order.status }}" selected>{{ order.get_status_display }}</option>
+                                {% if order.status == 'shipped' %}
+                                <option value="delivered">Confirm Delivery</option>
+                                {% endif %}
+                                {% if order.status != 'completed' and order.status != 'cancelled' %}
+                                <option value="cancelled">Cancel Order</option>
+                                {% endif %}
+
+                                {% else %}
+                                <option value="" disabled selected>-- Select Phase --</option>
+                                {% if order.status == 'pending' %}
+                                <option value="accepted">Accept Order</option>
+                                {% endif %}
+
+                                {% if order.is_cod %}
+                                {% if order.status == 'accepted' %}
+                                <option value="in_progress">Start Tailoring</option>
+                                {% endif %}
+                                {% else %}
+                                {% if order.status == 'accepted' %}
+                                <option value="paid">Confirm Payment (Paid)</option>
+                                {% endif %}
+                                {% if order.status == 'paid' %}
+                                <option value="in_progress">Start Tailoring</option>
+                                {% endif %}
+                                {% endif %}
+
+                                {% if order.status == 'altering' %}
+                                <option value="ready">Finish Alterations (Ready)</option>
+                                <option value="shipped">Mark as Shipped (Re-delivering)</option>
+                                {% endif %}
+
+                                {% if order.status == 'in_progress' %}
+                                <option value="ready">Finish Tailoring (Ready)</option>
+                                {% endif %}
+                                {% if order.status == 'ready' %}
+                                <option value="shipped">Mark as Shipped</option>
+                                {% endif %}
+
+                                {# Admin confirmation after shipping #}
+                                {% if order.status == 'shipped' and user.user_type == 'admin' or order.status == 'shipped' and user.is_superuser %}
+                                <option value="delivered">Confirm Delivery (Admin Only)</option>
+                                {% endif %}
+
+                                {# Designer can close only after delivery #}
+                                {% if order.status == 'delivered' or order.status == 'altering' %}
+                                <option value="completed">Close Order (Done)</option>
+                                {% endif %}
+
+                                {% endif %}
+                            </select>
+                        </div>
+                        <div class="form-group" style="margin-bottom: 20px;">
+                            <label>Notes for Customer</label>
+                            <textarea name="progress_notes" class="form-control" rows="3"
+                                placeholder="Explain the current progress..."></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary" style="width: 100%;">Update Status</button>
+                    </form>
+                    {% endif %}
+
+                    {% if user == order.customer %}
+                    {% if order.status == 'delivered' or order.status == 'completed' %}
+                    {% if not order.review %}
+                    <div style="margin-top: 30px; padding-top: 30px; border-top: 1px solid #eee;">
+                        <h4 style="margin-bottom: 20px;">Rate Your Experience</h4>
+                        <form action="{% url 'submit_review' order.pk %}" method="POST">
+                            {% csrf_token %}
+                            <div class="form-group" style="margin-bottom: 15px;">
+                                <label>Rating</label>
+                                <div style="display: flex; gap: 10px; margin-top: 10px;">
+                                    <div class="rating-input">
+                                        <input type="radio" name="rating" value="5" id="star5" required><label
+                                            for="star5" title="5 stars"><i class="fas fa-star"></i></label>
+                                        <input type="radio" name="rating" value="4" id="star4"><label for="star4"
+                                            title="4 stars"><i class="fas fa-star"></i></label>
+                                        <input type="radio" name="rating" value="3" id="star3"><label for="star3"
+                                            title="3 stars"><i class="fas fa-star"></i></label>
+                                        <input type="radio" name="rating" value="2" id="star2"><label for="star2"
+                                            title="2 stars"><i class="fas fa-star"></i></label>
+                                        <input type="radio" name="rating" value="1" id="star1"><label for="star1"
+                                            title="1 star"><i class="fas fa-star"></i></label>
+                                    </div>
+                                    <style>
+                                        .rating-input {
+                                            display: flex;
+                                            flex-direction: row-reverse;
+                                            justify-content: flex-end;
+                                        }
+
+                                        .rating-input input {
+                                            display: none;
+                                        }
+
+                                        .rating-input label {
+                                            cursor: pointer;
+                                            color: #ddd;
+                                            font-size: 1.5rem;
+                                            padding: 0 2px;
+                                            transition: color 0.2s;
+                                        }
+
+                                        .rating-input label:hover,
+                                        .rating-input label:hover~label,
+                                        .rating-input input:checked~label {
+                                            color: var(--accent);
+                                        }
+                                    </style>
+                                </div>
+                            </div>
+                            <div class="form-group" style="margin-bottom: 20px;">
+                                <label>Your Feedback</label>
+                                <textarea name="comment" class="form-control" rows="3"
+                                    placeholder="How was the designer's work?" required></textarea>
+                            </div>
+                            <button type="submit" class="btn btn-primary" style="width: 100%;">Submit Rating</button>
+                        </form>
+                    </div>
+                    {% else %}
+                    <div
+                        style="margin-top: 30px; padding: 20px; background: #f9f9f9; border-radius: 15px; text-align: center;">
+                        <p style="color: var(--text-muted); font-size: 0.9rem;">You rated this designer</p>
+                        <div style="color: var(--accent); margin: 10px 0;">
+                            {% for i in "12345" %}
+                            {% if order.review.rating >= forloop.counter %}
+                            <i class="fas fa-star"></i>
+                            {% else %}
+                            <i class="far fa-star"></i>
+                            {% endif %}
+                            {% endfor %}
+                        </div>
+                        <p style="font-style: italic; font-size: 0.85rem;">"{{ order.review.review_text }}"</p>
+                    </div>
+                    {% endif %}
+                    {% endif %}
+                    {% endif %}
+
+                    {% if order.alteration_request or user == order.customer and order.status == 'delivered' or user == order.customer and order.status == 'completed' %}
+                    <div style="margin-top: 30px; padding-top: 30px; border-top: 1px solid #eee;">
+                        <h4 style="margin-bottom: 5px;"><i class="fas fa-cut"
+                                style="margin-right: 8px; color: var(--primary);"></i>Alteration Request</h4>
+
+                        {% if order.alteration_request %}
+                        <style>
+                            .alteration-card {
+                                margin-top: 15px;
+                                padding: 20px;
+                                border-radius: 15px;
+                            }
+
+                            .alteration-pending {
+                                background: #f4f4ff;
+                                border-left: 4px solid var(--primary);
+                            }
+
+                            .alteration-accepted {
+                                background: #edfaf1;
+                                border-left: 4px solid #27ae60;
+                            }
+
+                            .alteration-rejected {
+                                background: #fff0f0;
+                                border-left: 4px solid #e74c3c;
+                            }
+
+                            .alteration-completed {
+                                background: #edfaf1;
+                                border-left: 4px solid #27ae60;
+                            }
+                        </style>
+                        <div class="alteration-card alteration-{{ order.alteration_request.status }}">
+                            <p
+                                style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.05em;">
+                                Alteration Status &mdash; {{ order.alteration_request.get_status_display }}</p>
+                            <p style="font-weight: 600;">{{ order.alteration_request.description }}</p>
+
+                            {% if order.alteration_request.status == 'pending' and user == order.designer.user %}
+                            <form action="{% url 'handle_alteration_response' order.pk %}" method="POST"
+                                style="margin-top: 20px;">
+                                {% csrf_token %}
+                                <div class="form-group" style="margin-bottom: 15px;">
+                                    <label style="font-size: 0.85rem; font-weight: 600;">Response Notes</label>
+                                    <textarea name="designer_notes" class="form-control" rows="2"
+                                        placeholder="e.g. Sure, I can do that. Please ship it back to me..."
+                                        required></textarea>
+                                </div>
+                                <div style="display: flex; gap: 10px;">
+                                    <button type="submit" name="action" value="accept" class="btn btn-primary"
+                                        style="flex: 1; padding: 10px;">Accept Request</button>
+                                    <button type="submit" name="action" value="reject" class="btn btn-outline"
+                                        style="flex: 1; border-color: #ff4d4d; color: #ff4d4d; padding: 10px;">Decline</button>
+                                </div>
+                            </form>
+                            {% endif %}
+
+                            {% if order.alteration_request.designer_notes %}
+                            <p
+                                style="margin-top: 15px; font-size: 0.9rem; color: var(--text-muted); padding-top: 15px; border-top: 1px dashed #ddd;">
+                                <strong>Designer Notes:</strong> {{ order.alteration_request.designer_notes }}
+                            </p>
+                            {% endif %}
+                        </div>
+
+                        {% elif user == order.customer and alteration_window_open %}
+                        <p style="font-size: 0.82rem; color: var(--text-muted); margin-bottom: 15px;">
+                            <i class="fas fa-clock" style="margin-right: 5px;"></i>
+                            You can request alterations within <strong>7 days</strong> of delivery.
+                        </p>
+                        <form action="{% url 'request_alteration' order.pk %}" method="POST" style="margin-top: 10px;">
+                            {% csrf_token %}
+                            <div class="form-group" style="margin-bottom: 15px;">
+                                <label>Describe the alterations needed</label>
+                                <textarea name="description" class="form-control" rows="3"
+                                    placeholder="e.g. The waist needs to be taken in by 2 cm..." required></textarea>
+                            </div>
+                            <button type="submit" class="btn btn-primary" style="width: 100%;">
+                                <i class="fas fa-cut" style="margin-right: 8px;"></i>Submit Alteration Request
+                            </button>
+                        </form>
+
+                        {% elif user == order.customer %}
+                        <div
+                            style="margin-top: 15px; padding: 18px; border-radius: 15px; background: #f9f9f9; text-align: center;">
+                            <i class="fas fa-lock"
+                                style="font-size: 1.5rem; color: #ccc; display: block; margin-bottom: 8px;"></i>
+                            <p style="color: var(--text-muted); font-size: 0.9rem;">The 7-day alteration window has
+                                passed. Alterations are no longer available for this order.</p>
+                        </div>
+                        {% endif %}
+                    </div>
+                    {% endif %}
+                </div>
+                <div style="background: white; padding: 35px; border-radius: 25px; box-shadow: var(--shadow);">
+                    <h3>Shipping Details</h3>
+                    <div style="margin-top: 20px;">
+                        <p style="color: var(--text-muted); font-size: 0.9rem;">Address</p>
+                        <p style="font-weight: 600; margin-top: 5px;">{{ order.shipping_address }}</p>
+                    </div>
+                    {% if order.tracking_number %}
+                    <div style="margin-top: 20px;">
+                        <p style="color: var(--text-muted); font-size: 0.9rem;">Tracking Number</p>
+                        <p style="font-weight: 700; color: var(--primary);">{{ order.tracking_number }}</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="animate-up" style="animation-delay: 0.1s;">
+                <div
+                    style="background: var(--bg-dark); color: white; padding: 35px; border-radius: 25px; box-shadow: var(--shadow); margin-bottom: 30px;">
+                    <h4 style="color: var(--primary); margin-bottom: 25px;">Creation Summary</h4>
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 15px;">
+                        <span style="color: #aaa;">Dress Type</span>
+                        <span>{{ order.dress_request.get_dress_type_display }}</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 15px;">
+                        <span style="color: #aaa;">Designer</span>
+                        <span>{{ order.designer.business_name }}</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 15px;">
+                        <span style="color: #aaa;">Agreed Price</span>
+                        <span style="font-weight: 700;">${{ order.final_price }}</span>
+                    </div>
+                    <hr style="border: 0; border-top: 1px solid #333; margin: 20px 0;">
+                    <p style="font-size: 0.8rem; color: #888; text-align: center;">Order protected by DressPlatform
+                        Guarantee</p>
+                </div>
+                <a href="{% url 'conversation_order' order.pk %}" class="btn btn-outline"
+                    style="width: 100%; border-color: #eee; color: #333;"><i class="fas fa-comments"
+                        style="margin-right: 10px;"></i> Direct Message Designer</a>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

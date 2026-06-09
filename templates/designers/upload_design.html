@@ -1,0 +1,60 @@
+{% extends 'base.html' %}
+
+{% block title %}{% if edit %}Edit Design{% else %}Upload New Design{% endif %} | DressPlatform{% endblock %}
+
+{% block content %}
+<section class="section">
+    <div style="max-width: 700px; margin: 0 auto;">
+        <div class="animate-up" style="margin-bottom: 40px; text-align: center;">
+            <h2 style="font-size: 2.5rem;">{% if edit %}Edit Your Design{% else %}Upload Your Design{% endif %}</h2>
+            <p style="color: var(--text-muted);">Share your latest creation with the community. Designs uploaded here
+                will also be featured on the home page.</p>
+        </div>
+
+        <div class="animate-up"
+            style="background: white; padding: 40px; border-radius: 30px; box-shadow: var(--shadow);">
+            <form method="POST" enctype="multipart/form-data">
+                {% csrf_token %}
+
+                <div class="form-group" style="margin-bottom: 20px;">
+                    <label style="font-weight: 600; margin-bottom: 8px; display: block;">Design Title</label>
+                    {{ form.title }}
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;">
+                    <div class="form-group">
+                        <label style="font-weight: 600; margin-bottom: 8px; display: block;">Category</label>
+                        {{ form.category }}
+                    </div>
+                    <div class="form-group">
+                        <label style="font-weight: 600; margin-bottom: 8px; display: block;">Starting Price ($)</label>
+                        {{ form.price_estimate }}
+                    </div>
+                </div>
+
+                <div class="form-group" style="margin-bottom: 20px;">
+                    <label style="font-weight: 600; margin-bottom: 8px; display: block;">Description</label>
+                    {{ form.description }}
+                    <small style="color: var(--text-muted);">Describe the materials, inspiration, and fit.</small>
+                </div>
+
+                <div class="form-group"
+                    style="margin-bottom: 30px; border: 2px dashed #eee; padding: 30px; border-radius: 20px; text-align: center;">
+                    <label style="font-weight: 600; margin-bottom: 15px; display: block;">Design Image</label>
+                    {{ form.image }}
+                    <p style="margin-top: 15px; font-size: 0.8rem; color: var(--text-muted);"><i
+                            class="fas fa-info-circle"></i> Use high-quality portrait images for better visibility.</p>
+                </div>
+
+                <div style="display: flex; gap: 15px;">
+                    <button type="submit" class="btn btn-primary" style="flex: 2; padding: 1.2rem;">
+                        {% if edit %}Save Changes{% else %}Publish Design{% endif %}
+                    </button>
+                    <a href="{% url 'designer_dashboard' %}" class="btn btn-outline"
+                        style="flex: 1; padding: 1.2rem; text-align: center;">Cancel</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</section>
+{% endblock %}

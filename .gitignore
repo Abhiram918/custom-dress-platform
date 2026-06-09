@@ -1,0 +1,15 @@
+venv311/
+__pycache__/
+*.pyc
+
+db.sqlite3
+
+media/
+
+.env
+.env.*
+
+.vscode/
+.idea/
+
+*.log

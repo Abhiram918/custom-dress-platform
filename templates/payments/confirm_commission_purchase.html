@@ -1,0 +1,140 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Confirm Commission | {{ dress_request.designer.business_name }}{% endblock %}
+
+{% block content %}
+<section class="section">
+    <div style="max-width: 1000px; margin: 0 auto;">
+        <div class="section-header">
+            <h2 style="font-size: 2.5rem;">Purchase Custom Design</h2>
+            <p>Finalize your order with <strong>{{ dress_request.designer.business_name }}</strong></p>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1.5fr; gap: 40px; margin-top: 40px;">
+            <div class="animate-up">
+                <div
+                    style="background: white; border-radius: 25px; box-shadow: var(--shadow); overflow: hidden; position: sticky; top: 120px;">
+                    <div style="padding: 35px; background: var(--bg-dark); color: white;">
+                        <h4 style="color: var(--primary); margin-bottom: 20px;">Order Summary</h4>
+                        <div style="margin-bottom: 20px;">
+                            <p style="color: #aaa; font-size: 0.85rem;">Dress Type</p>
+                            <p style="font-weight: 600;">{{ dress_request.get_dress_type_display }}</p>
+                        </div>
+                        <div style="margin-bottom: 20px;">
+                            <p style="color: #aaa; font-size: 0.85rem;">Description</p>
+                            <p style="font-size: 0.9rem;">{{ dress_request.description|truncatewords:20 }}</p>
+                        </div>
+                        <hr style="border: 0; border-top: 1px solid #333; margin: 20px 0;">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <span style="color: #aaa;">Quoted Price</span>
+                            <span style="font-size: 1.8rem; font-weight: 800; color: var(--primary);">${{ dress_request.quoted_price }}</span>
+                        </div>
+                    </div>
+                    <div style="padding: 25px; background: #fcfcfc;">
+                        <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 10px;"><i
+                                class="fas fa-info-circle" style="margin-right: 8px;"></i>Your measurements have already
+                            been saved from the request.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="animate-up" style="animation-delay: 0.1s;">
+                <div style="background: white; border-radius: 25px; box-shadow: var(--shadow); padding: 40px;">
+                    <form method="POST" id="purchase-form">
+                        {% csrf_token %}
+
+                        <h3 style="margin-bottom: 25px;"><i class="fas fa-truck"
+                                style="margin-right: 15px; color: var(--primary);"></i>Shipping Address</h3>
+                        <div style="margin-bottom: 30px;">
+                            <textarea name="address" required
+                                style="width: 100%; border: 2px solid #eee; border-radius: 15px; padding: 15px; font-family: inherit;"
+                                rows="3"
+                                placeholder="Street Address, City, State, ZIP Code">{{ user.address|default:'' }}</textarea>
+                        </div>
+
+                        <h3 style="margin-bottom: 25px;"><i class="fas fa-credit-card"
+                                style="margin-right: 15px; color: var(--primary);"></i>Payment Method</h3>
+                        <div style="display: flex; gap: 20px; margin-bottom: 30px;">
+                            <label
+                                style="flex: 1; padding: 15px; border: 2px solid #eee; border-radius: 15px; cursor: pointer; display: flex; align-items: center; gap: 10px;">
+                                <input type="radio" name="payment_method" value="cod" checked
+                                    onchange="toggleCardDetails(false)">
+                                <span>Cash on Delivery</span>
+                            </label>
+                            <label
+                                style="flex: 1; padding: 15px; border: 2px solid #eee; border-radius: 15px; cursor: pointer; display: flex; align-items: center; gap: 10px;">
+                                <input type="radio" name="payment_method" value="card"
+                                    onchange="toggleCardDetails(true)">
+                                <span>Credit / Debit Card</span>
+                            </label>
+                        </div>
+
+                        <div id="card-details-section"
+                            style="display: none; background: #f9f9f9; padding: 25px; border-radius: 15px; margin-bottom: 30px; border: 1px dashed #ccc;">
+                            <div style="margin-bottom: 20px;">
+                                <label
+                                    style="display: block; margin-bottom: 8px; font-size: 0.85rem; color: var(--text-muted);">16-Digit
+                                    Card Number</label>
+                                <input type="text" name="card_number" id="card_number" maxlength="16"
+                                    style="width: 100%; border: 2px solid #eee; border-radius: 12px; padding: 12px;"
+                                    placeholder="0000 0000 0000 0000">
+                            </div>
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                                <div>
+                                    <label
+                                        style="display: block; margin-bottom: 8px; font-size: 0.85rem; color: var(--text-muted);">Expiry
+                                        (MM/YY)</label>
+                                    <input type="text" name="expiry" id="expiry" maxlength="5"
+                                        style="width: 100%; border: 2px solid #eee; border-radius: 12px; padding: 12px;"
+                                        placeholder="MM/YY">
+                                </div>
+                                <div>
+                                    <label
+                                        style="display: block; margin-bottom: 8px; font-size: 0.85rem; color: var(--text-muted);">CVV</label>
+                                    <input type="text" name="cvv" id="cvv" maxlength="3"
+                                        style="width: 100%; border: 2px solid #eee; border-radius: 12px; padding: 12px;"
+                                        placeholder="123">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div style="margin-top: 40px;">
+                            <button type="submit" class="btn btn-primary"
+                                style="width: 100%; padding: 1.2rem; font-size: 1.1rem;">
+                                Pay Now &bull; ${{ dress_request.quoted_price }}
+                            </button>
+                            <p
+                                style="text-align: center; margin-top: 15px; font-size: 0.8rem; color: var(--text-muted);">
+                                <i class="fas fa-shield-alt" style="margin-right: 5px;"></i> Secured Payment Processing
+                            </p>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script>
+    function toggleCardDetails(show) {
+        const cardSection = document.getElementById('card-details-section');
+        const cardInputs = cardSection.querySelectorAll('input');
+
+        if (show) {
+            cardSection.style.display = 'block';
+            cardInputs.forEach(input => input.setAttribute('required', 'true'));
+        } else {
+            cardSection.style.display = 'none';
+            cardInputs.forEach(input => input.removeAttribute('required'));
+        }
+    }
+
+    document.getElementById('expiry').addEventListener('input', function (e) {
+        let value = e.target.value.replace(/\D/g, '');
+        if (value.length > 2) {
+            e.target.value = value.slice(0, 2) + '/' + value.slice(2, 4);
+        }
+    });
+</script>
+{% endblock %}

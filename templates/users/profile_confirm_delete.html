@@ -1,0 +1,82 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Delete Account - Custom Dress Platform{% endblock %}
+
+{% block extra_css %}
+<style>
+    .delete-container {
+        max-width: 500px;
+        margin: 100px auto;
+        padding: 0 20px;
+    }
+
+    .delete-card {
+        background: var(--white);
+        padding: 50px;
+        border-radius: 30px;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        text-align: center;
+        animation: fadeInUp 0.5s ease;
+    }
+
+    .delete-icon {
+        font-size: 4rem;
+        color: #e74c3c;
+        margin-bottom: 30px;
+    }
+
+    .delete-card h1 {
+        font-size: 1.8rem;
+        color: var(--secondary);
+        margin-bottom: 20px;
+    }
+
+    .delete-card p {
+        color: var(--text-muted);
+        margin-bottom: 40px;
+        line-height: 1.6;
+    }
+
+    .delete-actions {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    .btn-danger-confirm {
+        background: #e74c3c;
+        color: white;
+    }
+
+    .btn-danger-confirm:hover {
+        background: #c0392b;
+        transform: translateY(-2px);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="delete-container">
+    <div class="delete-card">
+        <div class="delete-icon">
+            <i class="fas fa-exclamation-triangle"></i>
+        </div>
+        <h1>Are you absolutely sure?</h1>
+        <p>This action is irreversible. All your personal data, requests, and orders history will be permanently deleted
+            from our system.</p>
+
+        <form method="post">
+            {% csrf_token %}
+            <div class="delete-actions">
+                <button type="submit" class="btn btn-danger-confirm">
+                    <i class="fas fa-trash-alt"></i> Yes, Delete My Account
+                </button>
+                <a href="{% url 'profile' %}" class="btn btn-outline">
+                    No, Keep My Account
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

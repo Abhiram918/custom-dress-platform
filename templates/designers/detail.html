@@ -1,0 +1,169 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ designer.business_name }} | DressPlatform{% endblock %}
+
+{% block content %}
+<section class="section">
+    <div class="animate-up"
+        style="background: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3)), url('https://images.unsplash.com/photo-1551232864-3f0890e580d9?ixlib=rb-4.0.3&auto=format&fit=crop&w=1600&q=80'); background-size: cover; background-position: center; height: 350px; border-radius: 40px; margin-bottom: 50px; display: flex; align-items: flex-end; padding: 50px; color: white; position: relative; overflow: hidden; box-shadow: var(--shadow);">
+        <div style="z-index: 2;">
+            <span
+                style="background: var(--primary); color: white; padding: 5px 15px; border-radius: 20px; font-size: 0.8rem; font-weight: 700; text-transform: uppercase;">
+                {{ designer.get_specialties_display }}
+            </span>
+            <h1 style="font-size: 3.5rem; margin-top: 15px; color: white;">
+                {{ designer.business_name }}
+            </h1>
+        </div>
+    </div>
+
+    <div style="display: grid; grid-template-columns: 1.5fr 1fr; gap: 50px;">
+        <!-- Left: Designer Info -->
+        <div class="animate-up">
+            <div style="margin-bottom: 40px;">
+                <p style="color: var(--text-muted); font-size: 1.1rem; line-height: 1.8;">
+                    {{ designer.bio }}
+                </p>
+            </div>
+
+            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 50px;">
+                <div
+                    style="background: white; padding: 25px; border-radius: 20px; box-shadow: var(--shadow); text-align: center;">
+                    <i class="fas fa-award" style="color: var(--primary); font-size: 1.5rem; margin-bottom: 10px;"></i>
+                    <h4 style="font-size: 0.9rem; color: var(--text-muted);">Experience</h4>
+                    <p style="font-weight: 700;">{{ designer.experience_years }} Years</p>
+                </div>
+                <div
+                    style="background: white; padding: 25px; border-radius: 20px; box-shadow: var(--shadow); text-align: center;">
+                    <i class="fas fa-star" style="color: var(--accent); font-size: 1.5rem; margin-bottom: 10px;"></i>
+                    <h4 style="font-size: 0.9rem; color: var(--text-muted);">Rating</h4>
+                    <p style="font-weight: 700;">{{ designer.rating }} / 5.0</p>
+                </div>
+                <div
+                    style="background: white; padding: 25px; border-radius: 20px; box-shadow: var(--shadow); text-align: center;">
+                    <i class="fas fa-check-circle" style="color: #2ecc71; font-size: 1.5rem; margin-bottom: 10px;"></i>
+                    <h4 style="font-size: 0.9rem; color: var(--text-muted);">Completed</h4>
+                    <p style="font-weight: 700;">{{ designer.total_orders }} Orders</p>
+                </div>
+            </div>
+
+            <h3>Portfolio</h3>
+            <div
+                style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; margin-top: 20px; margin-bottom: 50px;">
+                {% for design in designs %}
+                <div class="designer-card" style="overflow: hidden; padding: 0;">
+                    <div
+                        style="height: 250px; background-image: url('{{ design.image.url }}'); background-size: cover; background-position: center;">
+                    </div>
+                    <div style="padding: 15px;">
+                        <h4 style="margin: 0; font-size: 1rem;">{{ design.title }}</h4>
+                        <div
+                            style="display: flex; justify-content: space-between; align-items: center; margin-top: 10px;">
+                            <span style="font-size: 0.75rem; color: var(--primary);">{{ design.get_category_display}}</span>
+                            <div style="display: flex; gap: 8px;">
+                                {% if user.user_type == 'customer' %}
+                                <a href="{% url 'buy_now' design.pk %}" class="btn btn-primary"
+                                    style="padding: 5px 10px; font-size: 0.7rem;">Buy Now</a>
+                                <a href="{% url 'create_request' designer.pk %}?design={{ design.pk }}"
+                                    class="btn btn-outline" style="padding: 5px 10px; font-size: 0.7rem;">Commission</a>
+                                {% elif user == designer.user %}
+                                <a href="{% url 'edit_design' design.pk %}" class="btn btn-outline"
+                                    style="padding: 5px 10px; font-size: 0.7rem; border-color: var(--primary); color: var(--primary);"><i
+                                        class="fas fa-edit"></i> Edit</a>
+                                <a href="{% url 'delete_design' design.pk %}" class="btn btn-outline"
+                                    style="padding: 5px 10px; font-size: 0.7rem; border-color: #ff4d4d; color: #ff4d4d;"
+                                    onclick="return confirm('Are you sure you want to delete this design?')"><i
+                                        class="fas fa-trash"></i></a>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% empty %}
+                <div
+                    style="grid-column: span 2; padding: 40px; background: #f9f9f9; border-radius: 20px; text-align: center; border: 2px dashed #ddd;">
+                    <p style="color: var(--text-muted); margin: 0;">No portfolio designs uploaded yet.</p>
+                </div>
+                {% endfor %}
+            </div>
+
+            <h3>Client Reviews</h3>
+            <div style="margin-top: 20px;">
+                {% for review in reviews %}
+                <div
+                    style="background: white; padding: 25px; border-radius: 20px; box-shadow: var(--shadow); margin-bottom: 20px;">
+                    <div
+                        style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 15px;">
+                        <div>
+                            <p style="font-weight: 700; margin-bottom: 2px;">{{ review.customer.username }}</p>
+                            <p style="font-size: 0.8rem; color: var(--text-muted);">{{ review.created_at|date:"M d, Y" }}
+                            </p>
+                        </div>
+                        <div style="color: var(--accent);">
+                            {% for i in "12345" %}
+                            {% if review.rating >= forloop.counter|add:"0" %}
+                            <i class="fas fa-star"></i>
+                            {% else %}
+                            <i class="far fa-star"></i>
+                            {% endif %}
+                            {% endfor %}
+                        </div>
+                    </div>
+                    <p style="font-style: italic; color: #555;">"{{ review.review_text }}"</p>
+                    {% if review.designer_response %}
+                    <div
+                        style="margin-top: 15px; padding: 15px; background: #f8f9fa; border-radius: 12px; border-left: 3px solid var(--primary);">
+                        <p style="font-size: 0.85rem; font-weight: 700; color: var(--secondary); margin-bottom: 5px;">
+                            Designer Response:</p>
+                        <p style="font-size: 0.85rem; color: #666;">{{ review.designer_response }}</p>
+                    </div>
+                    {% endif %}
+                </div>
+                {% empty %}
+                <div
+                    style="padding: 40px; background: #f9f9f9; border-radius: 20px; text-align: center; border: 2px dashed #ddd;">
+                    <p style="color: var(--text-muted); margin: 0;">No reviews yet for this designer.</p>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Right: Action Card -->
+        <div class="animate-up" style="animation-delay: 0.2s;">
+            <div
+                style="background: white; padding: 40px; border-radius: 30px; box-shadow: var(--shadow); position: sticky; top: 120px; border: 1px solid rgba(0,0,0,0.05);">
+                <h3 style="margin-bottom: 30px; font-size: 1.5rem;">Estimate Your Piece</h3>
+
+                <div style="margin-bottom: 30px;">
+                    <span style="font-size: 0.9rem; color: var(--text-muted);">Starting From</span>
+                    <h2 style="font-size: 2.5rem; color: var(--secondary);">${{ designer.price_range_min }}</h2>
+                    <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 5px;">Prices vary based on
+                        complexity and materials.</p>
+                </div>
+
+                <ul style="list-style: none; margin-bottom: 40px;">
+                    <li style="margin-bottom: 15px; font-size: 0.95rem;"><i class="fas fa-check"
+                            style="color: var(--primary); margin-right: 15px;"></i> Direct Consultation</li>
+                    <li style="margin-bottom: 15px; font-size: 0.95rem;"><i class="fas fa-check"
+                            style="color: var(--primary); margin-right: 15px;"></i> Custom Sizing</li>
+                    <li style="margin-bottom: 15px; font-size: 0.95rem;"><i class="fas fa-check"
+                            style="color: var(--primary); margin-right: 15px;"></i> Material Selection</li>
+                </ul>
+
+                {% if user.user_type == 'customer' %}
+                <a href="{% url 'create_request' designer.pk %}" class="btn btn-primary"
+                    style="width: 100%; text-align: center; padding: 1.2rem;">Request Custom Design</a>
+                {% elif user == designer.user %}
+                <a href="{% url 'complete_profile' %}" class="btn btn-primary"
+                    style="width: 100%; text-align: center; padding: 1.2rem;">Update Profile</a>
+                <a href="{% url 'upload_design' %}" class="btn btn-outline"
+                    style="width: 100%; text-align: center; padding: 1.2rem; margin-top: 15px;">Add New Design</a>
+                {% endif %}
+
+                <p style="text-align: center; margin-top: 20px; font-size: 0.8rem; color: var(--text-muted);">Typically
+                    responds within 24 hours</p>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

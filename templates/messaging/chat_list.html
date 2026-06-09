@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+
+{% block title %}Messages | DressPlatform{% endblock %}
+
+{% block content %}
+<section class="section">
+    <div class="section-header">
+        <h2>Inboxes</h2>
+        <p>Your ongoing conversations with designers and clients.</p>
+    </div>
+
+    <div style="max-width: 800px; margin: 0 auto;">
+        <div style="background: white; border-radius: 30px; box-shadow: var(--shadow); overflow: hidden;">
+            {% for contact in contacts %}
+            <a href="{% url 'conversation' contact.id %}"
+                style="display: flex; align-items: center; padding: 25px 40px; text-decoration: none; color: inherit; border-bottom: 1px solid #f8f8f8; transition: background 0.3s ease;">
+                <div
+                    style="width: 60px; height: 60px; background: var(--bg-dark); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 1.2rem; margin-right: 25px;">
+                    {{ contact.username|slice:":1"|upper }}
+                </div>
+                <div style="flex: 1;">
+                    <h4 style="margin: 0; font-size: 1.1rem;">{{ contact.get_full_name|default:contact.username }}</h4>
+                    <p style="color: var(--text-muted); font-size: 0.85rem; margin-top: 5px;">Click to view conversation
+                    </p>
+                </div>
+                <i class="fas fa-chevron-right" style="color: #eee;"></i>
+            </a>
+            {% empty %}
+            <div style="text-align: center; padding: 100px;">
+                <i class="fas fa-comment-slash" style="font-size: 3rem; color: #eee; margin-bottom: 20px;"></i>
+                <h3>No messages yet.</h3>
+                <p>Start a conversation from a design request or an order.</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endblock %}

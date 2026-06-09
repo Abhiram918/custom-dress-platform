@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+
+{% block title %}Payment Successful | DressPlatform{% endblock %}
+
+{% block content %}
+<section class="section">
+    <div style="max-width: 600px; margin: 0 auto; text-align: center;" class="animate-up">
+        <div
+            style="background: #e8f5e9; color: #2e7d32; width: 80px; height: 80px; line-height: 80px; border-radius: 50%; margin: 0 auto 30px; font-size: 2rem;">
+            <i class="fas fa-check"></i>
+        </div>
+
+        <h2 style="font-size: 2.5rem; margin-bottom: 15px;">Payment Confirmed</h2>
+        <p style="color: var(--text-muted); font-size: 1.1rem; margin-bottom: 40px;">Thank you for your trust. Your
+            order <strong>#{{ order.order_number }}</strong> has been officially created and the designer has been
+            notified.</p>
+
+        <div
+            style="background: white; padding: 40px; border-radius: 25px; box-shadow: var(--shadow); margin-bottom: 40px; text-align: left;">
+            <h4 style="margin-bottom: 20px; border-bottom: 1px solid #f0f0f0; padding-bottom: 10px;">Order Summary</h4>
+            <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                <span>Amount Paid:</span>
+                <span style="font-weight: 700;">${{ order.final_price }}</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                <span>Designer:</span>
+                <span style="font-weight: 700;">{{ order.designer.business_name }}</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                <span>Status:</span>
+                <span style="font-weight: 700; color: #2e7d32;">{{ order.get_status_display }}</span>
+            </div>
+        </div>
+
+        <div style="display: flex; gap: 20px; justify-content: center;">
+            <a href="{% url 'my_orders' %}" class="btn btn-primary" style="padding: 1rem 2rem;">View My Orders</a>
+            <a href="{% url 'home' %}" class="btn btn-outline" style="padding: 1rem 2rem;">Return Home</a>
+        </div>
+    </div>
+</section>
+{% endblock %}
